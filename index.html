@@ -7,9 +7,11 @@
     <script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'></script>
     <link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet' />
     <script src="https://unpkg.com/pmtiles@2.11.0/dist/index.js"></script>
+    <!--
     <script src="https://unpkg.com/@maplibre/maplibre-gl-geocoder@1.2.0/dist/maplibre-gl-geocoder.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/@maplibre/maplibre-gl-geocoder@1.2.0/dist/maplibre-gl-geocoder.css"
         type="text/css" />
+    -->
     <style>
         body {
             margin: 0;
@@ -211,6 +213,7 @@
             hash: true,
         });
 
+        /*
         //ジオコーダー（国土地理院 地名検索API）
         var geocoder_api = {
             forwardGeocode: async (config) => {
@@ -247,6 +250,7 @@
             }
         };
         map.addControl(new MaplibreGeocoder(geocoder_api, { maplibregl: maplibregl }), 'top-right');
+        */
 
         // ズーム・回転
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
