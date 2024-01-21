@@ -1,6 +1,7 @@
+# Public Website
 https://shi-works.github.io/noto-hanto-earthquake-2024-mlit-road-opening-map-on-maplibre-gl-js/
 
-### 国土交通省
+# 国土交通省
 - 令和6年能登半島地震 道路復旧見える化マップ
     - 出典：https://www.mlit.go.jp/road/r6noto/index2.html
     - 掲載情報：緊急復旧済み区間
