@@ -21,9 +21,9 @@
         }
 
         .map-overlay {
-            font: 14px/16px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+            font: 14px/14px 'Helvetica Neue', Arial, Helvetica, sans-serif;
             position: absolute;
-            width: 250px;
+            width: 240px;
             top: 0;
             left: 10px;
             padding: 10px;
@@ -35,15 +35,30 @@
             border-radius: 3px;
             padding: 10px;
             margin-bottom: 10px;
+            line-height: 14px;
         }
 
         .map-overlay input {
             background-color: transparent;
             display: inline-block;
-            width: 230px;
+            width: 220px;
             position: relative;
             margin: 0;
             cursor: ew-resize;
+        }
+
+        .map-overlay h4 {
+            font-size: 14px;
+            line-height: 1.2;
+            margin-top: 5px;
+            margin-bottom: 5px;
+        }
+
+        .map-overlay #date_label {
+            font-size: 14px;
+            line-height: 1.2;
+            margin-top: 5px;
+            margin-bottom: 5px;
         }
 
         .legend {
@@ -164,9 +179,11 @@
     <div class="map-overlay top">
         <div class="map-overlay-inner">
             <h4>緊急復旧済み区間（1/12～1/21）</h4>
+            <!--
             使用データ：<br>
             <a href="https://www.mlit.go.jp/road/r6noto/index2.html" target="_blank" rel="noopener">
                 令和6年能登半島地震 道路復旧見える化マップGISデータ</a><br><br>
+            -->
             <label id="date_label"></label>
             <input id="slider" type="range" min="0" max="9" step="1" value="0">
         </div>
