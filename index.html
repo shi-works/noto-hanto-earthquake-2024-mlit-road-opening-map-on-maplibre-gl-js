@@ -489,6 +489,38 @@
                 }
             });
 
+            // 令和2年簡易100mメッシュ人口（石川県）ソース
+            map.addSource("100m_mesh_pop2020_ishikawa", {
+                type: "vector",
+                url: "pmtiles://https://xs489works.xsrv.jp/pmtiles-data/100m_mesh_pop2020/100m_mesh_pop2020_ishikawa.pmtiles",
+                attribution: '<a href="https://gtfs-gis.jp/teikyo/index.html" target="_blank">地域・交通データ研究所 簡易100mメッシュ人口データ(2020年国勢調査ベース)</a>',
+            });
+
+            // 令和2年簡易100mメッシュ人口（石川県）レイヤ
+            map.addLayer({
+                'id': '100m_mesh_pop2020_ishikawa-fill',
+                'type': 'fill-extrusion',
+                'source': '100m_mesh_pop2020_ishikawa',
+                'source-layer': "100m_mesh_pop2020_ishikawafgb",
+                'layout': {
+                    'visibility': 'visible'
+                },
+                'paint': {
+                    'fill-extrusion-color': [
+                        "case",
+                        p1, pop_colors[0],
+                        p2, pop_colors[1],
+                        p3, pop_colors[2],
+                        p4, pop_colors[3],
+                        p5, pop_colors[4],
+                        p6, pop_colors[5],
+                        pop_colors[5]
+                    ],
+                    'fill-extrusion-height': ["*", ['to-number', ["get", "PopT"]], 10],
+                    'fill-extrusion-opacity': 0.5
+                }
+            });
+
             // 国土交通省 道路復旧見える化マップ
 
             // 新しいソースとレイヤーを追加する関数
@@ -534,10 +566,11 @@
                         'layout': {
                             'text-field': ['get', 'name'],
                             'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-                            'text-size': 14,
+                            'text-size': 12,
                             'symbol-placement': 'line-center',
                             'text-anchor': 'top',
                             'text-allow-overlap': true,
+                            'visibility': 'visible'
                         },
                         'paint': {
                             'text-color': '#000',
@@ -580,12 +613,10 @@
                         'layout': {
                             'text-field': ['get', 'name'],
                             'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-                            'text-size': 14,
+                            'text-size': 12,
                             'symbol-placement': 'line-center',
                             'text-anchor': 'top',
                             'text-allow-overlap': true,
-                        },
-                        layout: {
                             'visibility': 'none'
                         },
                         'paint': {
@@ -601,38 +632,6 @@
             // 新しいソースとレイヤーを追加
             var dates = ['240112data', '240113data', '240114data', '240115data', '240116data', '240117data', '240118data', '240119data', '240120data'];
             dates.forEach(date => addEmergencyRestoredSectionLayer(date));
-
-            // 令和2年簡易100mメッシュ人口（石川県）ソース
-            map.addSource("100m_mesh_pop2020_ishikawa", {
-                type: "vector",
-                url: "pmtiles://https://xs489works.xsrv.jp/pmtiles-data/100m_mesh_pop2020/100m_mesh_pop2020_ishikawa.pmtiles",
-                attribution: '<a href="https://gtfs-gis.jp/teikyo/index.html" target="_blank">地域・交通データ研究所 簡易100mメッシュ人口データ(2020年国勢調査ベース)</a>',
-            });
-
-            // 令和2年簡易100mメッシュ人口（石川県）レイヤ
-            map.addLayer({
-                'id': '100m_mesh_pop2020_ishikawa-fill',
-                'type': 'fill-extrusion',
-                'source': '100m_mesh_pop2020_ishikawa',
-                'source-layer': "100m_mesh_pop2020_ishikawafgb",
-                'layout': {
-                    'visibility': 'visible'
-                },
-                'paint': {
-                    'fill-extrusion-color': [
-                        "case",
-                        p1, pop_colors[0],
-                        p2, pop_colors[1],
-                        p3, pop_colors[2],
-                        p4, pop_colors[3],
-                        p5, pop_colors[4],
-                        p6, pop_colors[5],
-                        pop_colors[5]
-                    ],
-                    'fill-extrusion-height': ["*", ['to-number', ["get", "PopT"]], 10],
-                    'fill-extrusion-opacity': 0.5
-                }
-            });
 
             // 役場ソース
             map.addSource('town-hall', {
