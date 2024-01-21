@@ -163,12 +163,12 @@
     </div>
     <div class="map-overlay top">
         <div class="map-overlay-inner">
-            <h4>緊急復旧済み区間（1/12～1/20）</h4>
+            <h4>緊急復旧済み区間（1/12～1/21）</h4>
             使用データ：<br>
             <a href="https://www.mlit.go.jp/road/r6noto/index2.html" target="_blank" rel="noopener">
                 令和6年能登半島地震 道路復旧見える化マップGISデータ</a><br><br>
             <label id="date_label"></label>
-            <input id="slider" type="range" min="0" max="8" step="1" value="0">
+            <input id="slider" type="range" min="0" max="9" step="1" value="0">
         </div>
     </div>
     <script type="module">
@@ -528,7 +528,8 @@
                 // 緊急復旧済み区間ソース
                 map.addSource(date, {
                     type: 'geojson',
-                    data: './data/mlit/' + date + '/json/emergency_restored_section.geojson'
+                    data: './data/mlit/' + date + '/json/emergency_restored_section.geojson',
+                    attribution: '<a href="https://www.mlit.go.jp/road/r6noto/index2.html" target="_blank">令和6年能登半島地震 道路復旧見える化マップ(国土交通省)</a>',
                 });
 
                 if (date === '240112data') {
@@ -630,7 +631,7 @@
             }
 
             // 新しいソースとレイヤーを追加
-            var dates = ['240112data', '240113data', '240114data', '240115data', '240116data', '240117data', '240118data', '240119data', '240120data'];
+            var dates = ['240112data', '240113data', '240114data', '240115data', '240116data', '240117data', '240118data', '240119data', '240120data', '240121data'];
             dates.forEach(date => addEmergencyRestoredSectionLayer(date));
 
             // 役場ソース
@@ -761,6 +762,7 @@
             "240118data": "6",
             "240119data": "7",
             "240120data": "8",
+            "240121data": "9",
         };
 
         // スライダーの値から日付文字列への変換関数
