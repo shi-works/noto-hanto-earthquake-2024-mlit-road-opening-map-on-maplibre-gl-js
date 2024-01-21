@@ -525,6 +525,24 @@
                             'line-opacity': 1
                         }
                     });
+
+                    // 路線名ラベルレイヤ
+                    map.addLayer({
+                        'id': date + '-label',
+                        'type': 'symbol',
+                        'source': date,
+                        'layout': {
+                            'text-field': ['get', 'name'], // 'name' は GeoJSON の属性
+                            'text-size': 14,
+                            'symbol-placement': 'line-center',
+                            'text-anchor': 'center'
+                        },
+                        'paint': {
+                            'text-color': '#000',
+                            'text-halo-color': '#fff',
+                            'text-halo-width': 1
+                        }
+                    });
                 } else {
                     // 緊急復旧済み区間レイヤ
                     map.addLayer({
@@ -551,9 +569,31 @@
                             'line-opacity': 1
                         }
                     });
+
+                    // 路線名ラベルレイヤ
+                    map.addLayer({
+                        'id': date + '-label',
+                        'type': 'symbol',
+                        'source': date,
+                        'layout': {
+                            'text-field': ['get', 'name'], // 'name' は GeoJSON の属性
+                            'text-size': 14,
+                            'symbol-placement': 'line-center',
+                            'text-anchor': 'center'
+                        },
+                        layout: {
+                            'visibility': 'none'
+                        },
+                        'paint': {
+                            'text-color': '#000',
+                            'text-halo-color': '#fff',
+                            'text-halo-width': 1
+                        }
+                    });
                 }
 
             }
+
             // 新しいソースとレイヤーを追加
             var dates = ['240112data', '240113data', '240114data', '240115data', '240116data', '240117data', '240118data', '240119data', '240120data'];
             dates.forEach(date => addEmergencyRestoredSectionLayer(date));
@@ -741,6 +781,7 @@
             for (let id in Map_AddLayer) {
                 let visibility = (Map_AddLayer[id] === sliderValue) ? 'visible' : 'none';
                 map.setLayoutProperty(id, 'visibility', visibility);
+                map.setLayoutProperty(date + '-label', 'visibility', visibility);
             }
         });
 
