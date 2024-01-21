@@ -532,10 +532,12 @@
                         'type': 'symbol',
                         'source': date,
                         'layout': {
-                            'text-field': ['get', 'name'], // 'name' は GeoJSON の属性
+                            'text-field': ['get', 'name'],
+                            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
                             'text-size': 14,
                             'symbol-placement': 'line-center',
-                            'text-anchor': 'center'
+                            'text-anchor': 'top',
+                            'text-allow-overlap': true,
                         },
                         'paint': {
                             'text-color': '#000',
@@ -576,10 +578,12 @@
                         'type': 'symbol',
                         'source': date,
                         'layout': {
-                            'text-field': ['get', 'name'], // 'name' は GeoJSON の属性
+                            'text-field': ['get', 'name'],
+                            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
                             'text-size': 14,
                             'symbol-placement': 'line-center',
-                            'text-anchor': 'center'
+                            'text-anchor': 'top',
+                            'text-allow-overlap': true,
                         },
                         layout: {
                             'visibility': 'none'
@@ -781,7 +785,7 @@
             for (let id in Map_AddLayer) {
                 let visibility = (Map_AddLayer[id] === sliderValue) ? 'visible' : 'none';
                 map.setLayoutProperty(id, 'visibility', visibility);
-                map.setLayoutProperty(date + '-label', 'visibility', visibility);
+                map.setLayoutProperty(id + '-label', 'visibility', visibility);
             }
         });
 
