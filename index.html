@@ -170,7 +170,7 @@
         <div class="square"
             style='background-color: rgb(255, 0, 0, 0.2); outline: 2px solid;outline-color: rgba(255, 0, 0, 1); display: inline-block;'>
         </div>
-        <span style="margin-left: 5px;">斜面崩壊・堆積範囲(1/19更新)</span><br>
+        <span style="margin-left: 5px;">斜面崩壊・堆積範囲(1/22更新)</span><br>
         <div style="height: 5px;"></div>
     </div>
     <div id="legend-road" style="display:visible;" class="legend-road">
@@ -180,14 +180,14 @@
     </div>
     <div class="map-overlay top">
         <div class="map-overlay-inner">
-            <h4>緊急復旧済み区間（1/12～1/21）</h4>
+            <h4>緊急復旧済み区間（1/12～1/22）</h4>
             <!--
             使用データ：<br>
             <a href="https://www.mlit.go.jp/road/r6noto/index2.html" target="_blank" rel="noopener">
                 令和6年能登半島地震 道路復旧見える化マップGISデータ</a><br><br>
             -->
             <label id="date_label"></label>
-            <input id="slider" type="range" min="0" max="9" step="1" value="0">
+            <input id="slider" type="range" min="0" max="10" step="1" value="0">
         </div>
     </div>
     <script type="module">
@@ -482,17 +482,17 @@
             });
 
             // 斜面崩壊・堆積分布データ（輪島西地区）ソース
-            map.addSource("hokai_all_20240112_wajimaWEST", {
+            map.addSource("hokai_20240122_wajimaWEST", {
                 type: "geojson",
-                data: './data/gsi/hokai_all_20240112_wajimaWEST.geojson',
+                data: './data/gsi/hokai_20240122_wajimaWEST.geojson',
                 attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ）</a>'
             });
 
             // 斜面崩壊・堆積分布データ（輪島西地区）ラインレイヤ
             map.addLayer({
-                'id': 'hokai_all_20240112_wajimaWEST-line',
+                'id': 'hokai_20240122_wajimaWEST-line',
                 "type": "line",
-                'source': 'hokai_all_20240112_wajimaWEST',
+                'source': 'hokai_20240122_wajimaWEST',
                 'paint': {
                     'line-color': '#FF0000',
                     'line-width': 2
@@ -501,9 +501,9 @@
 
             // 斜面崩壊・堆積分布データ（輪島西地区）ポリゴンレイヤ
             map.addLayer({
-                'id': 'hokai_all_20240112_wajimaWEST-fill',
+                'id': 'hokai_20240122_wajimaWEST-fill',
                 "type": "fill",
-                'source': 'hokai_all_20240112_wajimaWEST',
+                'source': 'hokai_20240122_wajimaWEST',
                 'paint': {
                     'fill-color': '#FF0000',
                     'fill-opacity': 0.2
@@ -652,7 +652,7 @@
             }
 
             // 新しいソースとレイヤーを追加
-            var dates = ['240112data', '240113data', '240114data', '240115data', '240116data', '240117data', '240118data', '240119data', '240120data', '240121data'];
+            var dates = ['240112data', '240113data', '240114data', '240115data', '240116data', '240117data', '240118data', '240119data', '240120data', '240121data', '240122data'];
             dates.forEach(date => addEmergencyRestoredSectionLayer(date));
 
             // 役場ソース
@@ -784,6 +784,7 @@
             "240119data": "7",
             "240120data": "8",
             "240121data": "9",
+            "240122data": "10",
         };
 
         // スライダーの値から日付文字列への変換関数
