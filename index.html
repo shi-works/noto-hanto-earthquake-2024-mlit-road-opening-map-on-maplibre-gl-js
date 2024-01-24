@@ -175,14 +175,14 @@
     </div>
     <div class="map-overlay top">
         <div class="map-overlay-inner">
-            <h4>緊急復旧済み区間（1/12～1/22）</h4>
+            <h4>緊急復旧済み区間（1/12～1/23）</h4>
             <!--
             使用データ：<br>
             <a href="https://www.mlit.go.jp/road/r6noto/index2.html" target="_blank" rel="noopener">
                 令和6年能登半島地震 道路復旧見える化マップGISデータ</a><br><br>
             -->
             <label id="date_label"></label>
-            <input id="slider" type="range" min="0" max="10" step="1" value="0">
+            <input id="slider" type="range" min="0" max="11" step="1" value="0">
         </div>
     </div>
     <script type="module">
@@ -610,7 +610,21 @@
             }
 
             // 新しいソースとレイヤーを追加
-            var dates = ['240112data', '240113data', '240114data', '240115data', '240116data', '240117data', '240118data', '240119data', '240120data', '240121data', '240122data'];
+            var dates = [
+                '240112data',
+                '240113data',
+                '240114data',
+                '240115data',
+                '240116data',
+                '240117data',
+                '240118data',
+                '240119data',
+                '240120data',
+                '240121data',
+                '240122data',
+                '240123data',
+            ];
+
             dates.forEach(date => addEmergencyRestoredSectionLayer(date));
 
             // 役場ソース
@@ -743,6 +757,7 @@
             "240120data": "8",
             "240121data": "9",
             "240122data": "10",
+            "240123data": "11",
         };
 
         // スライダーの値から日付文字列への変換関数
