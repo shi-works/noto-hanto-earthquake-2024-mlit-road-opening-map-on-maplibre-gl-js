@@ -175,14 +175,14 @@
     </div>
     <div class="map-overlay top">
         <div class="map-overlay-inner">
-            <h4>緊急復旧済み区間（1/12～1/23）</h4>
+            <h4>緊急復旧済み区間（1/12～1/24）</h4>
             <!--
             使用データ：<br>
             <a href="https://www.mlit.go.jp/road/r6noto/index2.html" target="_blank" rel="noopener">
                 令和6年能登半島地震 道路復旧見える化マップGISデータ</a><br><br>
             -->
             <label id="date_label"></label>
-            <input id="slider" type="range" min="0" max="11" step="1" value="0">
+            <input id="slider" type="range" min="0" max="12" step="1" value="0">
         </div>
     </div>
     <script type="module">
@@ -468,6 +468,8 @@
                 }
             });
 
+            // ============================== 令和2年簡易100mメッシュ人口 ==============================
+
             // 令和2年簡易100mメッシュ人口（石川県）ソース
             map.addSource("100m_mesh_pop2020_ishikawa", {
                 type: "vector",
@@ -500,7 +502,7 @@
                 }
             });
 
-            // 国土交通省 道路復旧見える化マップ
+            // ==============================  国土交通省 道路復旧見える化マップ ==============================
 
             // 新しいソースとレイヤーを追加する関数
             function addEmergencyRestoredSectionLayer(date) {
@@ -623,6 +625,7 @@
                 '240121data',
                 '240122data',
                 '240123data',
+                '240124data',
             ];
 
             dates.forEach(date => addEmergencyRestoredSectionLayer(date));
@@ -758,6 +761,7 @@
             "240121data": "9",
             "240122data": "10",
             "240123data": "11",
+            "240124data": "12",
         };
 
         // スライダーの値から日付文字列への変換関数
