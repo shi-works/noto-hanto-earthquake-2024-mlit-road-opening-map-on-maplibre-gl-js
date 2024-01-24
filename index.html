@@ -7,11 +7,6 @@
     <script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'></script>
     <link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet' />
     <script src="https://unpkg.com/pmtiles@2.11.0/dist/index.js"></script>
-    <!--
-    <script src="https://unpkg.com/@maplibre/maplibre-gl-geocoder@1.2.0/dist/maplibre-gl-geocoder.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/@maplibre/maplibre-gl-geocoder@1.2.0/dist/maplibre-gl-geocoder.css"
-        type="text/css" />
-    -->
     <style>
         body {
             margin: 0;
@@ -32,7 +27,7 @@
         }
 
         .map-overlay .map-overlay-inner {
-            background-color: rgba(255, 255, 255, 0.9);
+            background-color: rgba(255, 255, 255, 0.8);
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
             border-radius: 3px;
             padding: 10px;
@@ -213,45 +208,6 @@
             hash: true,
         });
 
-        /*
-        //ジオコーダー（国土地理院 地名検索API）
-        var geocoder_api = {
-            forwardGeocode: async (config) => {
-                const features = [];
-                const Text_Prefix = config.query.substr(0, 3);
-                try {
-                    let request = 'https://msearch.gsi.go.jp/address-search/AddressSearch?q=' + config.query;
-                    const response = await fetch(request);
-                    const geojson = await response.json();
-
-                    for (var i = 0; i < geojson.length; i++) {
-                        if (geojson[i].properties.title.indexOf(Text_Prefix) !== -1) {
-                            let point = {
-                                type: 'Feature',
-                                geometry: {
-                                    type: 'Point',
-                                    coordinates: geojson[i].geometry.coordinates
-                                },
-                                place_name: geojson[i].properties.title,
-                                properties: geojson[i].properties,
-                                text: geojson[i].properties.title,
-                                place_type: ['place'],
-                                center: geojson[i].geometry.coordinates
-                            };
-                            features.push(point);
-                        }
-                    }
-                } catch (e) {
-                    console.error(`Failed to forwardGeocode with error: ${e}`);
-                }
-                return {
-                    features: features
-                };
-            }
-        };
-        map.addControl(new MaplibreGeocoder(geocoder_api, { maplibregl: maplibregl }), 'top-right');
-        */
-
         // ズーム・回転
         map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
@@ -364,11 +320,13 @@
                 }
             });
 
+            // ============================== 斜面崩壊・堆積分布データ ==============================
+
             // 斜面崩壊・堆積分布データ（珠洲地区、輪島東地区）ソース
             map.addSource("hokai_all_20240106_suzu-wajimaEAST", {
                 type: "geojson",
-                data: './data/gsi/hokai_all_20240106_suzu-wajimaEAST.geojson',
-                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ）</a>'
+                data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_all_20240106_suzu-wajimaEAST.geojson',
+                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>'
             });
 
             // 斜面崩壊・堆積分布データ（珠洲地区、輪島東地区）ラインレイヤ
@@ -389,7 +347,7 @@
                 'source': 'hokai_all_20240106_suzu-wajimaEAST',
                 'paint': {
                     'fill-color': '#FF0000',
-                    'fill-opacity': 0.2
+                    'fill-opacity': 0.1
                 }
             });
 
@@ -397,8 +355,8 @@
             map.addSource("hokai_all_20240115_wajimaCENTRAL", {
                 type: "geojson",
                 // data: './data/hokai_all_20240106_wajimaCENTRAL.geojson',
-                data: './data/gsi/hokai_all_20240115_wajimaCENTRAL_Re2.geojson',
-                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ）</a>'
+                data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_all_20240115_wajimaCENTRAL_Re2.geojson',
+                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>'
             });
 
             // 斜面崩壊・堆積分布データ（輪島中地区）ラインレイヤ
@@ -419,15 +377,15 @@
                 'source': 'hokai_all_20240115_wajimaCENTRAL',
                 'paint': {
                     'fill-color': '#FF0000',
-                    'fill-opacity': 0.2
+                    'fill-opacity': 0.1
                 }
             });
 
             // 斜面崩壊・堆積分布データ（穴水地区）ソース
             map.addSource("hokai_all_20240118_anamizu", {
                 type: "geojson",
-                data: './data/gsi/hokai_all_20240118_anamizu.geojson',
-                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ）</a>'
+                data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_all_20240118_anamizu.geojson',
+                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>'
             });
 
             // 斜面崩壊・堆積分布データ（穴水地区）ラインレイヤ
@@ -448,15 +406,15 @@
                 'source': 'hokai_all_20240118_anamizu',
                 'paint': {
                     'fill-color': '#FF0000',
-                    'fill-opacity': 0.2
+                    'fill-opacity': 0.1
                 }
             });
 
             // 斜面崩壊・堆積分布データ（七尾地区）ソース
             map.addSource("hokai_all_20240118_nanao", {
                 type: "geojson",
-                data: './data/gsi/hokai_all_20240118_nanao.geojson',
-                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ）</a>'
+                data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_all_20240118_nanao.geojson',
+                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>'
             });
 
             // 斜面崩壊・堆積分布データ（七尾地区）ラインレイヤ
@@ -477,15 +435,15 @@
                 'source': 'hokai_all_20240118_nanao',
                 'paint': {
                     'fill-color': '#FF0000',
-                    'fill-opacity': 0.2
+                    'fill-opacity': 0.1
                 }
             });
 
             // 斜面崩壊・堆積分布データ（輪島西地区）ソース
             map.addSource("hokai_20240122_wajimaWEST", {
                 type: "geojson",
-                data: './data/gsi/hokai_20240122_wajimaWEST.geojson',
-                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ）</a>'
+                data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_20240122_wajimaWEST.geojson',
+                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>'
             });
 
             // 斜面崩壊・堆積分布データ（輪島西地区）ラインレイヤ
@@ -506,7 +464,7 @@
                 'source': 'hokai_20240122_wajimaWEST',
                 'paint': {
                     'fill-color': '#FF0000',
-                    'fill-opacity': 0.2
+                    'fill-opacity': 0.1
                 }
             });
 
