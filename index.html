@@ -175,14 +175,14 @@
     </div>
     <div class="map-overlay top">
         <div class="map-overlay-inner">
-            <h4>緊急復旧済み区間（1/12～1/31）</h4>
+            <h4>緊急復旧済み区間（1/12～2/2）</h4>
             <!--
             使用データ：<br>
             <a href="https://www.mlit.go.jp/road/r6noto/index2.html" target="_blank" rel="noopener">
                 令和6年能登半島地震 道路復旧見える化マップGISデータ</a><br><br>
             -->
             <label id="date_label"></label>
-            <input id="slider" type="range" min="0" max="19" step="1" value="0">
+            <input id="slider" type="range" min="0" max="21" step="1" value="0">
         </div>
     </div>
     <script type="module">
@@ -633,6 +633,8 @@
                 '240129data',
                 '240130data',
                 '240131data',
+                '240201data',
+                '240202data',
             ];
 
             dates.forEach(date => addEmergencyRestoredSectionLayer(date));
@@ -776,13 +778,36 @@
             "240129data": "17",
             "240130data": "18",
             "240131data": "19",
+            "240201data": "20",
+            "240202data": "21",
         };
 
         // スライダーの値から日付文字列への変換関数
+        /*
         function sliderValueToDate(sliderValue) {
             let year = "2024";
             let month = "01";
             let day = parseInt(sliderValue) + 12; // 0を12日に変換
+            return `${year}年${month}月${day.toString().padStart(2, '0')}日正午時点`;
+        }
+        */
+
+        // スライダーの値から日付文字列への変換関数
+        function sliderValueToDate(sliderValue) {
+            let year = "2024";
+            let month;
+            let day;
+
+            // 1月の日数を計算（1月12日から始まるため、sliderValueが19以下の場合は1月）
+            if (sliderValue <= 19) { // 1月31日までの計算 (19 = 31 - 12)
+                month = "01";
+                day = parseInt(sliderValue) + 12; // 0を12日に変換
+            } else { // 2月の計算
+                month = "02";
+                // 2月1日からの日付を計算するために、1月の日数を超えた分から計算する
+                day = parseInt(sliderValue) - 19; // 2月1日に調整
+            }
+
             return `${year}年${month}月${day.toString().padStart(2, '0')}日正午時点`;
         }
 
