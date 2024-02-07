@@ -1,789 +1,733 @@
 <html>
+    <head>
+        <title>令和6年能登半島地震 道路啓開状況マップ</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+        <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+        <script src="https://unpkg.com/pmtiles@2.11.0/dist/index.js"></script>
+        <style>
+            body {
+                margin: 0;
+            }
 
-<head>
-    <title>令和6年能登半島地震 道路啓開状況マップ</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js'></script>
-    <link href='https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css' rel='stylesheet' />
-    <script src="https://unpkg.com/pmtiles@2.11.0/dist/index.js"></script>
-    <style>
-        body {
-            margin: 0;
-        }
+            #map {
+                height: 100%;
+                width: 100%;
+            }
 
-        #map {
-            height: 100%;
-            width: 100%;
-        }
+            .map-overlay {
+                font: 14px/14px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+                position: absolute;
+                width: 240px;
+                top: 0;
+                left: 10px;
+                padding: 10px;
+            }
 
-        .map-overlay {
-            font: 14px/14px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-            position: absolute;
-            width: 240px;
-            top: 0;
-            left: 10px;
-            padding: 10px;
-        }
+            .map-overlay .map-overlay-inner {
+                background-color: rgba(255, 255, 255, 0.8);
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+                border-radius: 3px;
+                padding: 10px;
+                margin-bottom: 10px;
+                line-height: 14px;
+            }
 
-        .map-overlay .map-overlay-inner {
-            background-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-            border-radius: 3px;
-            padding: 10px;
-            margin-bottom: 10px;
-            line-height: 14px;
-        }
+            .map-overlay input {
+                background-color: transparent;
+                display: inline-block;
+                width: 220px;
+                position: relative;
+                margin: 0;
+                cursor: ew-resize;
+            }
 
-        .map-overlay input {
-            background-color: transparent;
-            display: inline-block;
-            width: 220px;
-            position: relative;
-            margin: 0;
-            cursor: ew-resize;
-        }
+            .map-overlay h4 {
+                font-size: 14px;
+                line-height: 1.2;
+                margin-top: 5px;
+                margin-bottom: 5px;
+            }
 
-        .map-overlay h4 {
-            font-size: 14px;
-            line-height: 1.2;
-            margin-top: 5px;
-            margin-bottom: 5px;
-        }
+            .map-overlay #date_label {
+                font-size: 14px;
+                line-height: 1.2;
+                margin-top: 5px;
+                margin-bottom: 5px;
+            }
 
-        .map-overlay #date_label {
-            font-size: 14px;
-            line-height: 1.2;
-            margin-top: 5px;
-            margin-bottom: 5px;
-        }
+            .legend {
+                background-color: rgba(255, 255, 255, 0.8);
+                border-radius: 3px;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+                font: 12px/14px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+                padding: 10px;
+                position: absolute;
+                bottom: 160px;
+                right: 10px;
+                z-index: 1;
+                line-height: 10px;
+                height: auto;
+            }
 
-        .legend {
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 3px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10);
-            font: 12px/14px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-            padding: 10px;
-            position: absolute;
-            bottom: 160px;
-            right: 10px;
-            z-index: 1;
-            line-height: 10px;
-            height: auto;
-        }
+            .legend div span {
+                border-radius: 50%;
+                display: inline-block;
+                height: 15px;
+                margin-right: 10px;
+                width: 15px;
+                color: orangered;
+            }
 
-        .legend div span {
-            border-radius: 50%;
-            display: inline-block;
-            height: 15px;
-            margin-right: 10px;
-            width: 15px;
-            color: orangered
-        }
+            .square {
+                width: 15px;
+                height: 15px;
+                /*border-radius: 4px;*/
+            }
 
-        .square {
-            width: 15px;
-            height: 15px;
-            /*border-radius: 4px;*/
-        }
+            .legend-pop {
+                background-color: rgba(255, 255, 255, 0.8);
+                border-radius: 3px;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+                font: 12px/14px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+                padding: 10px;
+                position: absolute;
+                bottom: 205px;
+                right: 10px;
+                z-index: 1;
+                line-height: 20px;
+                height: auto;
+            }
 
+            .legend-pop h4 {
+                margin: 0 0 10px;
+            }
 
-        .legend-pop {
-            background-color: rgba(255, 255, 255, 0.8);
-            border-radius: 3px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.10);
-            font: 12px/14px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-            padding: 10px;
-            position: absolute;
-            bottom: 205px;
-            right: 10px;
-            z-index: 1;
-            line-height: 20px;
-            height: auto;
-        }
+            .legend-pop div span {
+                border-radius: 50%;
+                display: inline-block;
+                height: 15px;
+                margin-right: 10px;
+                width: 15px;
+                color: orangered;
+            }
 
-        .legend-pop h4 {
-            margin: 0 0 10px;
-        }
+            .square {
+                width: 15px;
+                height: 15px;
+            }
 
-        .legend-pop div span {
-            border-radius: 50%;
-            display: inline-block;
-            height: 15px;
-            margin-right: 10px;
-            width: 15px;
-            color: orangered
-        }
+            .legend-road {
+                position: absolute;
+                bottom: 50px;
+                right: 10px;
+                z-index: 1;
+                background: white;
+                padding: 5px;
+                box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+                width: fit-content;
+            }
 
-        .square {
-            width: 15px;
-            height: 15px;
-        }
+            .image-container {
+                display: flex;
+                justify-content: center;
+            }
 
+            .legend-road img {
+                width: 264px;
+                height: 93px;
+            }
+        </style>
+    </head>
 
-        .legend-road {
-            position: absolute;
-            bottom: 50px;
-            right: 10px;
-            z-index: 1;
-            background: white;
-            padding: 5px;
-            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-            width: fit-content;
-        }
-
-        .image-container {
-            display: flex;
-            justify-content: center;
-        }
-
-        .legend-road img {
-            width: 264px;
-            height: 93px;
-        }
-    </style>
-</head>
-
-<body>
-    <div id="map"></div>
-    <div id="legend-pop" style="display:visible;" class='legend-pop'>
-        <h4>人口(100mﾒｯｼｭ)</h4>
-        <div class="square" style='background-color: #0000FF; display: inline-block;'>
-        </div><span style="display: inline-block; margin-left: 5px;">～10人未満</span><br>
-        <div class="square" style='background-color: #00FFFF; display: inline-block;'>
-        </div><span style="display: inline-block; margin-left: 5px;">10～20人未満</span><br>
-        <div class="square" style='background-color: #00FF00; display: inline-block;'>
-        </div><span style="display: inline-block; margin-left: 5px;">20～40人未満</span><br>
-        <div class="square" style='background-color: #FFBF00; display: inline-block;'>
-        </div><span style="display: inline-block; margin-left: 5px;">40～60人未満</span><br>
-        <div class="square" style='background-color: #FF0000; display: inline-block;'>
-        </div><span style="display: inline-block; margin-left: 5px;">60～80人未満</span><br>
-        <div class="square" style='background-color: #CB00CB; display: inline-block;'>
-        </div><span style="display: inline-block; margin-left: 5px;">80人以上</span><br>
-    </div>
-    <div id='legend' style="display:visible;" class='legend'>
-        <div class="square"
-            style='background-color: rgb(255, 0, 0, 0.2); outline: 2px solid;outline-color: rgba(255, 0, 0, 1); display: inline-block;'>
+    <body>
+        <div id="map"></div>
+        <div id="legend-pop" style="display: visible" class="legend-pop">
+            <h4>人口(100mﾒｯｼｭ)</h4>
+            <div class="square" style="background-color: #0000ff; display: inline-block"></div>
+            <span style="display: inline-block; margin-left: 5px">～10人未満</span><br />
+            <div class="square" style="background-color: #00ffff; display: inline-block"></div>
+            <span style="display: inline-block; margin-left: 5px">10～20人未満</span><br />
+            <div class="square" style="background-color: #00ff00; display: inline-block"></div>
+            <span style="display: inline-block; margin-left: 5px">20～40人未満</span><br />
+            <div class="square" style="background-color: #ffbf00; display: inline-block"></div>
+            <span style="display: inline-block; margin-left: 5px">40～60人未満</span><br />
+            <div class="square" style="background-color: #ff0000; display: inline-block"></div>
+            <span style="display: inline-block; margin-left: 5px">60～80人未満</span><br />
+            <div class="square" style="background-color: #cb00cb; display: inline-block"></div>
+            <span style="display: inline-block; margin-left: 5px">80人以上</span><br />
         </div>
-        <span style="margin-left: 5px;">斜面崩壊・堆積範囲(1/22更新)</span><br>
-        <div style="height: 5px;"></div>
-    </div>
-    <div id="legend-road" style="display:visible;" class="legend-road">
-        <div class="image-container">
-            <img src="./img/usage_guide_kai.png" id="legend-road-image">
+        <div id="legend" style="display: visible" class="legend">
+            <div class="square" style="background-color: rgb(255, 0, 0, 0.2); outline: 2px solid; outline-color: rgba(255, 0, 0, 1); display: inline-block"></div>
+            <span style="margin-left: 5px">斜面崩壊・堆積範囲(1/22更新)</span><br />
+            <div style="height: 5px"></div>
         </div>
-    </div>
-    <div class="map-overlay top">
-        <div class="map-overlay-inner">
-            <h4>緊急復旧済み区間（1/12～2/2）</h4>
-            <!--
+        <div id="legend-road" style="display: visible" class="legend-road">
+            <div class="image-container">
+                <img src="./img/usage_guide_kai.png" id="legend-road-image" />
+            </div>
+        </div>
+        <div class="map-overlay top">
+            <div class="map-overlay-inner">
+                <h4>緊急復旧済み区間（1/12～2/7）</h4>
+                <!--
             使用データ：<br>
             <a href="https://www.mlit.go.jp/road/r6noto/index2.html" target="_blank" rel="noopener">
                 令和6年能登半島地震 道路復旧見える化マップGISデータ</a><br><br>
             -->
-            <label id="date_label"></label>
-            <input id="slider" type="range" min="0" max="21" step="1" value="0">
+                <label id="date_label"></label>
+                <input id="slider" type="range" min="0" max="26" step="1" value="0" />
+            </div>
         </div>
-    </div>
-    <script type="module">
-        // Terrain-RGB形式への変換モジュール
-        import { makeNumPngProtocol } from './numPngProtocol.js'
-        maplibregl.addProtocol('numpng', makeNumPngProtocol());
+        <script type="module">
+            // Terrain-RGB形式への変換モジュール
+            import { makeNumPngProtocol } from './numPngProtocol.js';
+            maplibregl.addProtocol('numpng', makeNumPngProtocol());
 
-        // addProtocolの設定
-        let protocol = new pmtiles.Protocol();
-        maplibregl.addProtocol("pmtiles", protocol.tile);
+            // addProtocolの設定
+            let protocol = new pmtiles.Protocol();
+            maplibregl.addProtocol('pmtiles', protocol.tile);
 
-        // マップを初期化
-        const map = new maplibregl.Map({
-            container: 'map',
-            // style: 'std.json',
-            style: 'https://tile.openstreetmap.jp/styles/maptiler-basic-ja/style.json',
-            zoom: 10.16,
-            center: [137.0474, 37.3225],
-            pitch: 0,
-            bearing: 0,
-            maxPitch: 85,
-            attributionControl: false,
-            hash: true,
-        });
-
-        // ズーム・回転
-        map.addControl(new maplibregl.NavigationControl(), 'top-right');
-
-        // フルスクリーンモードのオンオフ
-        map.addControl(new maplibregl.FullscreenControl(), 'top-right');
-
-        // 現在位置表示
-        map.addControl(new maplibregl.GeolocateControl({
-            positionOptions: {
-                enableHighAccuracy: false
-            },
-            fitBoundsOptions: { maxZoom: 18 },
-            trackUserLocation: true,
-            showUserLocation: true
-        }), 'top-right');
-
-        // スケール表示
-        map.addControl(new maplibregl.ScaleControl({
-            maxWidth: 200,
-            unit: 'metric'
-        }));
-
-        // Attributionを折りたたみ表示
-        map.addControl(new maplibregl.AttributionControl({
-            compact: true,
-            customAttribution: '（<a href="https://twitter.com/shi__works" target="_blank">Twitter</a> | <a href="https://github.com/shi-works/noto-hanto-earthquake-2024-mlit-road-opening-map-on-maplibre-gl-js" target="_blank">Github</a>）'
-        }));
-
-        // 3D地形コントロール
-        map.addControl(
-            new maplibregl.TerrainControl({
-                source: 'aist-dem',
-                exaggeration: 1 // 標高を強調する倍率
-            }), 'top-right'
-        );
-
-        // 人口色分け用のフィルタ準備
-        let p1 = ["all", [">=", ['to-number', ["get", "PopT"]], 0], ["<", ['to-number', ["get", "PopT"]], 10]];
-        let p2 = ["all", [">=", ['to-number', ["get", "PopT"]], 10], ["<", ['to-number', ["get", "PopT"]], 20]];
-        let p3 = ["all", [">=", ['to-number', ["get", "PopT"]], 20], ["<", ['to-number', ["get", "PopT"]], 40]];
-        let p4 = ["all", [">=", ['to-number', ["get", "PopT"]], 40], ["<", ['to-number', ["get", "PopT"]], 60]];
-        let p5 = ["all", [">=", ['to-number', ["get", "PopT"]], 60], ["<", ['to-number', ["get", "PopT"]], 80]];
-        let p6 = ["all", [">=", ['to-number', ["get", "PopT"]], 80], ["<", ['to-number', ["get", "PopT"]], 1000000]];
-
-        // 人口色分け用色の準備
-        let pop_colors = [
-            '#0000FF',
-            '#00FFFF',
-            '#00FF00',
-            '#FFBF00',
-            '#FF0000',
-            '#CB00CB'
-        ]
-
-        // マップをロード
-        map.on('load', () => {
-            // 産総研 シームレス標高タイルソース
-            map.addSource("aist-dem", {
-                type: 'raster-dem',
-                tiles: [
-                    'numpng://tiles.gsj.jp/tiles/elev/mixed/{z}/{y}/{x}.png',
-                ],
-                attribution: '<a href="https://tiles.gsj.jp/tiles/elev/tiles.html" target="_blank">産業技術総合研究所 シームレス標高タイル(統合DEM)</a>',
-                tileSize: 256
+            // マップを初期化
+            const map = new maplibregl.Map({
+                container: 'map',
+                // style: 'std.json',
+                style: 'https://tile.openstreetmap.jp/styles/maptiler-basic-ja/style.json',
+                zoom: 10.16,
+                center: [137.0474, 37.3225],
+                pitch: 0,
+                bearing: 0,
+                maxPitch: 85,
+                attributionControl: false,
+                hash: true,
             });
 
-            // 産総研 シームレス標高タイルセット
-            // map.setTerrain({ 'source': 'aist-dem', 'exaggeration': 1 });
+            // ズーム・回転
+            map.addControl(new maplibregl.NavigationControl(), 'top-right');
 
-            // 陰影起伏図ソース
-            map.addSource("hillshade", {
-                type: 'raster',
-                tiles: [
-                    'https://cyberjapandata.gsi.go.jp/xyz/hillshademap/{z}/{x}/{y}.png',
-                ],
-                attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html#hillshademap" target="_blank">地理院タイル(陰影起伏図)</a>',
-                tileSize: 256
-            });
+            // フルスクリーンモードのオンオフ
+            map.addControl(new maplibregl.FullscreenControl(), 'top-right');
 
-            // 陰影起伏図レイヤ
-            map.addLayer({
-                id: 'hillshade',
-                type: 'raster',
-                source: 'hillshade',
-                minzoom: 2,
-                maxzoom: 18,
-                paint: {
-                    'raster-opacity': 0.3
-                }
-            });
+            // 現在位置表示
+            map.addControl(
+                new maplibregl.GeolocateControl({
+                    positionOptions: {
+                        enableHighAccuracy: false,
+                    },
+                    fitBoundsOptions: { maxZoom: 18 },
+                    trackUserLocation: true,
+                    showUserLocation: true,
+                }),
+                'top-right'
+            );
 
-            // 行政区域（ポリゴン）ソース
-            map.addSource("pmtiles-gyouseikai", {
-                type: "vector",
-                url: "pmtiles://" + "https://xs489works.xsrv.jp/pmtiles-data/ksj/N03-23_230101_gyouseikai.pmtiles",
-                attribution: '<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-v3_1.html">国土数値情報 行政区域データ（令和5年度）</a>'
-            });
+            // スケール表示
+            map.addControl(
+                new maplibregl.ScaleControl({
+                    maxWidth: 200,
+                    unit: 'metric',
+                })
+            );
 
-            // 行政区域ラインレイヤ
-            map.addLayer({
-                "id": "gyouseikai-line",
-                "type": "line",
-                "source": "pmtiles-gyouseikai",
-                "source-layer": "N0323_230101_gyouseikai",
-                minzoom: 9,
-                maxzoom: 18,
-                'paint': {
-                    'line-color': 'rgba(0, 0, 0, 1)',
-                    'line-width': 1.5
-                }
-            });
+            // Attributionを折りたたみ表示
+            map.addControl(
+                new maplibregl.AttributionControl({
+                    compact: true,
+                    customAttribution: '（<a href="https://twitter.com/shi__works" target="_blank">Twitter</a> | <a href="https://github.com/shi-works/noto-hanto-earthquake-2024-mlit-road-opening-map-on-maplibre-gl-js" target="_blank">Github</a>）',
+                })
+            );
 
-            // ============================== 斜面崩壊・堆積分布データ ==============================
+            // 3D地形コントロール
+            map.addControl(
+                new maplibregl.TerrainControl({
+                    source: 'aist-dem',
+                    exaggeration: 1, // 標高を強調する倍率
+                }),
+                'top-right'
+            );
 
-            // 斜面崩壊・堆積分布データ（珠洲地区、輪島東地区）ソース
-            map.addSource("hokai_all_20240106_suzu-wajimaEAST", {
-                type: "geojson",
-                data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_all_20240106_suzu-wajimaEAST.geojson',
-                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>'
-            });
+            // 人口色分け用のフィルタ準備
+            let p1 = ['all', ['>=', ['to-number', ['get', 'PopT']], 0], ['<', ['to-number', ['get', 'PopT']], 10]];
+            let p2 = ['all', ['>=', ['to-number', ['get', 'PopT']], 10], ['<', ['to-number', ['get', 'PopT']], 20]];
+            let p3 = ['all', ['>=', ['to-number', ['get', 'PopT']], 20], ['<', ['to-number', ['get', 'PopT']], 40]];
+            let p4 = ['all', ['>=', ['to-number', ['get', 'PopT']], 40], ['<', ['to-number', ['get', 'PopT']], 60]];
+            let p5 = ['all', ['>=', ['to-number', ['get', 'PopT']], 60], ['<', ['to-number', ['get', 'PopT']], 80]];
+            let p6 = ['all', ['>=', ['to-number', ['get', 'PopT']], 80], ['<', ['to-number', ['get', 'PopT']], 1000000]];
 
-            // 斜面崩壊・堆積分布データ（珠洲地区、輪島東地区）ラインレイヤ
-            map.addLayer({
-                'id': 'hokai_all_20240106_suzu-wajimaEAST-line',
-                "type": "line",
-                'source': 'hokai_all_20240106_suzu-wajimaEAST',
-                'paint': {
-                    'line-color': '#FF0000',
-                    'line-width': 2
-                }
-            });
+            // 人口色分け用色の準備
+            let pop_colors = ['#0000FF', '#00FFFF', '#00FF00', '#FFBF00', '#FF0000', '#CB00CB'];
 
-            // 斜面崩壊・堆積分布データ（珠洲地区、輪島東地区）ポリゴンレイヤ
-            map.addLayer({
-                'id': 'hokai_all_20240106_suzu-wajimaEAST-fill',
-                "type": "fill",
-                'source': 'hokai_all_20240106_suzu-wajimaEAST',
-                'paint': {
-                    'fill-color': '#FF0000',
-                    'fill-opacity': 0.1
-                }
-            });
-
-            // 斜面崩壊・堆積分布データ（輪島中地区）ソース
-            map.addSource("hokai_all_20240115_wajimaCENTRAL", {
-                type: "geojson",
-                // data: './data/hokai_all_20240106_wajimaCENTRAL.geojson',
-                data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_all_20240115_wajimaCENTRAL_Re2.geojson',
-                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>'
-            });
-
-            // 斜面崩壊・堆積分布データ（輪島中地区）ラインレイヤ
-            map.addLayer({
-                'id': 'hokai_all_20240115_wajimaCENTRAL-line',
-                "type": "line",
-                'source': 'hokai_all_20240115_wajimaCENTRAL',
-                'paint': {
-                    'line-color': '#FF0000',
-                    'line-width': 2
-                }
-            });
-
-            // 斜面崩壊・堆積分布データ（輪島中地区）ポリゴンレイヤ
-            map.addLayer({
-                'id': 'hokai_all_20240115_wajimaCENTRAL-fill',
-                "type": "fill",
-                'source': 'hokai_all_20240115_wajimaCENTRAL',
-                'paint': {
-                    'fill-color': '#FF0000',
-                    'fill-opacity': 0.1
-                }
-            });
-
-            // 斜面崩壊・堆積分布データ（穴水地区）ソース
-            map.addSource("hokai_all_20240118_anamizu", {
-                type: "geojson",
-                data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_all_20240118_anamizu.geojson',
-                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>'
-            });
-
-            // 斜面崩壊・堆積分布データ（穴水地区）ラインレイヤ
-            map.addLayer({
-                'id': 'hokai_all_20240118_anamizu-line',
-                "type": "line",
-                'source': 'hokai_all_20240118_anamizu',
-                'paint': {
-                    'line-color': '#FF0000',
-                    'line-width': 2
-                }
-            });
-
-            // 斜面崩壊・堆積分布データ（穴水地区）ポリゴンレイヤ
-            map.addLayer({
-                'id': 'hokai_all_20240118_anamizu-fill',
-                "type": "fill",
-                'source': 'hokai_all_20240118_anamizu',
-                'paint': {
-                    'fill-color': '#FF0000',
-                    'fill-opacity': 0.1
-                }
-            });
-
-            // 斜面崩壊・堆積分布データ（七尾地区）ソース
-            map.addSource("hokai_all_20240118_nanao", {
-                type: "geojson",
-                data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_all_20240118_nanao.geojson',
-                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>'
-            });
-
-            // 斜面崩壊・堆積分布データ（七尾地区）ラインレイヤ
-            map.addLayer({
-                'id': 'hokai_all_20240118_nanao-line',
-                "type": "line",
-                'source': 'hokai_all_20240118_nanao',
-                'paint': {
-                    'line-color': '#FF0000',
-                    'line-width': 2
-                }
-            });
-
-            // 斜面崩壊・堆積分布データ（七尾地区）ポリゴンレイヤ
-            map.addLayer({
-                'id': 'hokai_all_20240118_nanao-fill',
-                "type": "fill",
-                'source': 'hokai_all_20240118_nanao',
-                'paint': {
-                    'fill-color': '#FF0000',
-                    'fill-opacity': 0.1
-                }
-            });
-
-            // 斜面崩壊・堆積分布データ（輪島西地区）ソース
-            map.addSource("hokai_20240122_wajimaWEST", {
-                type: "geojson",
-                data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_20240122_wajimaWEST.geojson',
-                attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>'
-            });
-
-            // 斜面崩壊・堆積分布データ（輪島西地区）ラインレイヤ
-            map.addLayer({
-                'id': 'hokai_20240122_wajimaWEST-line',
-                "type": "line",
-                'source': 'hokai_20240122_wajimaWEST',
-                'paint': {
-                    'line-color': '#FF0000',
-                    'line-width': 2
-                }
-            });
-
-            // 斜面崩壊・堆積分布データ（輪島西地区）ポリゴンレイヤ
-            map.addLayer({
-                'id': 'hokai_20240122_wajimaWEST-fill',
-                "type": "fill",
-                'source': 'hokai_20240122_wajimaWEST',
-                'paint': {
-                    'fill-color': '#FF0000',
-                    'fill-opacity': 0.1
-                }
-            });
-
-            // ============================== 令和2年簡易100mメッシュ人口 ==============================
-
-            // 令和2年簡易100mメッシュ人口（石川県）ソース
-            map.addSource("100m_mesh_pop2020_ishikawa", {
-                type: "vector",
-                url: "pmtiles://https://xs489works.xsrv.jp/pmtiles-data/100m_mesh_pop2020/100m_mesh_pop2020_ishikawa.pmtiles",
-                attribution: '<a href="https://gtfs-gis.jp/teikyo/index.html" target="_blank">地域・交通データ研究所 簡易100mメッシュ人口データ(2020年国勢調査ベース)</a>',
-            });
-
-            // 令和2年簡易100mメッシュ人口（石川県）レイヤ
-            map.addLayer({
-                'id': '100m_mesh_pop2020_ishikawa-fill',
-                'type': 'fill-extrusion',
-                'source': '100m_mesh_pop2020_ishikawa',
-                'source-layer': "100m_mesh_pop2020_ishikawafgb",
-                'layout': {
-                    'visibility': 'visible'
-                },
-                'paint': {
-                    'fill-extrusion-color': [
-                        "case",
-                        p1, pop_colors[0],
-                        p2, pop_colors[1],
-                        p3, pop_colors[2],
-                        p4, pop_colors[3],
-                        p5, pop_colors[4],
-                        p6, pop_colors[5],
-                        pop_colors[5]
-                    ],
-                    'fill-extrusion-height': ["*", ['to-number', ["get", "PopT"]], 10],
-                    'fill-extrusion-opacity': 0.5
-                }
-            });
-
-            // ==============================  国土交通省 道路復旧見える化マップ ==============================
-
-            // 新しいソースとレイヤーを追加する関数
-            function addEmergencyRestoredSectionLayer(date) {
-                // 緊急復旧済み区間ソース
-                map.addSource(date, {
-                    type: 'geojson',
-                    data: './data/mlit/' + date + '/json/emergency_restored_section.geojson',
-                    attribution: '<a href="https://www.mlit.go.jp/road/r6noto/index2.html" target="_blank">令和6年能登半島地震 道路復旧見える化マップ(国土交通省)</a>',
+            // マップをロード
+            map.on('load', () => {
+                // 産総研 シームレス標高タイルソース
+                map.addSource('aist-dem', {
+                    type: 'raster-dem',
+                    tiles: ['numpng://tiles.gsj.jp/tiles/elev/mixed/{z}/{y}/{x}.png'],
+                    attribution: '<a href="https://tiles.gsj.jp/tiles/elev/tiles.html" target="_blank">産業技術総合研究所 シームレス標高タイル(統合DEM)</a>',
+                    tileSize: 256,
                 });
 
-                if (date === '240112data') {
-                    // 緊急復旧済み区間レイヤ
-                    map.addLayer({
-                        'id': date,
-                        "type": "line",
-                        'source': date,
-                        minzoom: 1,
-                        maxzoom: 23,
-                        layout: {
-                            'visibility': 'visible'
-                        },
-                        paint: {
-                            'line-color': [
-                                'match',
-                                ['get', '_color'],
-                                '#0000ff', '#0000ff',
-                                '#990000', '#990000',
-                                '#6aa84f', '#00B050',
-                                '#ff00ff', '#ff00ff',
-                                '#000000', '#000000',
-                                '#656565'
-                            ],
-                            'line-width': 6,
-                            'line-opacity': 1
-                        }
+                // 産総研 シームレス標高タイルセット
+                // map.setTerrain({ 'source': 'aist-dem', 'exaggeration': 1 });
+
+                // 陰影起伏図ソース
+                map.addSource('hillshade', {
+                    type: 'raster',
+                    tiles: ['https://cyberjapandata.gsi.go.jp/xyz/hillshademap/{z}/{x}/{y}.png'],
+                    attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html#hillshademap" target="_blank">地理院タイル(陰影起伏図)</a>',
+                    tileSize: 256,
+                });
+
+                // 陰影起伏図レイヤ
+                map.addLayer({
+                    id: 'hillshade',
+                    type: 'raster',
+                    source: 'hillshade',
+                    minzoom: 2,
+                    maxzoom: 18,
+                    paint: {
+                        'raster-opacity': 0.3,
+                    },
+                });
+
+                // 行政区域（ポリゴン）ソース
+                map.addSource('pmtiles-gyouseikai', {
+                    type: 'vector',
+                    url: 'pmtiles://' + 'https://xs489works.xsrv.jp/pmtiles-data/ksj/N03-23_230101_gyouseikai.pmtiles',
+                    attribution: '<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-N03-v3_1.html">国土数値情報 行政区域データ（令和5年度）</a>',
+                });
+
+                // 行政区域ラインレイヤ
+                map.addLayer({
+                    id: 'gyouseikai-line',
+                    type: 'line',
+                    source: 'pmtiles-gyouseikai',
+                    'source-layer': 'N0323_230101_gyouseikai',
+                    minzoom: 9,
+                    maxzoom: 18,
+                    paint: {
+                        'line-color': 'rgba(0, 0, 0, 1)',
+                        'line-width': 1.5,
+                    },
+                });
+
+                // ============================== 斜面崩壊・堆積分布データ ==============================
+
+                // 斜面崩壊・堆積分布データ（珠洲地区、輪島東地区）ソース
+                map.addSource('hokai_all_20240106_suzu-wajimaEAST', {
+                    type: 'geojson',
+                    data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_all_20240106_suzu-wajimaEAST.geojson',
+                    attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>',
+                });
+
+                // 斜面崩壊・堆積分布データ（珠洲地区、輪島東地区）ラインレイヤ
+                map.addLayer({
+                    id: 'hokai_all_20240106_suzu-wajimaEAST-line',
+                    type: 'line',
+                    source: 'hokai_all_20240106_suzu-wajimaEAST',
+                    paint: {
+                        'line-color': '#FF0000',
+                        'line-width': 2,
+                    },
+                });
+
+                // 斜面崩壊・堆積分布データ（珠洲地区、輪島東地区）ポリゴンレイヤ
+                map.addLayer({
+                    id: 'hokai_all_20240106_suzu-wajimaEAST-fill',
+                    type: 'fill',
+                    source: 'hokai_all_20240106_suzu-wajimaEAST',
+                    paint: {
+                        'fill-color': '#FF0000',
+                        'fill-opacity': 0.1,
+                    },
+                });
+
+                // 斜面崩壊・堆積分布データ（輪島中地区）ソース
+                map.addSource('hokai_all_20240115_wajimaCENTRAL', {
+                    type: 'geojson',
+                    // data: './data/hokai_all_20240106_wajimaCENTRAL.geojson',
+                    data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_all_20240115_wajimaCENTRAL_Re2.geojson',
+                    attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>',
+                });
+
+                // 斜面崩壊・堆積分布データ（輪島中地区）ラインレイヤ
+                map.addLayer({
+                    id: 'hokai_all_20240115_wajimaCENTRAL-line',
+                    type: 'line',
+                    source: 'hokai_all_20240115_wajimaCENTRAL',
+                    paint: {
+                        'line-color': '#FF0000',
+                        'line-width': 2,
+                    },
+                });
+
+                // 斜面崩壊・堆積分布データ（輪島中地区）ポリゴンレイヤ
+                map.addLayer({
+                    id: 'hokai_all_20240115_wajimaCENTRAL-fill',
+                    type: 'fill',
+                    source: 'hokai_all_20240115_wajimaCENTRAL',
+                    paint: {
+                        'fill-color': '#FF0000',
+                        'fill-opacity': 0.1,
+                    },
+                });
+
+                // 斜面崩壊・堆積分布データ（穴水地区）ソース
+                map.addSource('hokai_all_20240118_anamizu', {
+                    type: 'geojson',
+                    data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_all_20240118_anamizu.geojson',
+                    attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>',
+                });
+
+                // 斜面崩壊・堆積分布データ（穴水地区）ラインレイヤ
+                map.addLayer({
+                    id: 'hokai_all_20240118_anamizu-line',
+                    type: 'line',
+                    source: 'hokai_all_20240118_anamizu',
+                    paint: {
+                        'line-color': '#FF0000',
+                        'line-width': 2,
+                    },
+                });
+
+                // 斜面崩壊・堆積分布データ（穴水地区）ポリゴンレイヤ
+                map.addLayer({
+                    id: 'hokai_all_20240118_anamizu-fill',
+                    type: 'fill',
+                    source: 'hokai_all_20240118_anamizu',
+                    paint: {
+                        'fill-color': '#FF0000',
+                        'fill-opacity': 0.1,
+                    },
+                });
+
+                // 斜面崩壊・堆積分布データ（七尾地区）ソース
+                map.addSource('hokai_all_20240118_nanao', {
+                    type: 'geojson',
+                    data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_all_20240118_nanao.geojson',
+                    attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>',
+                });
+
+                // 斜面崩壊・堆積分布データ（七尾地区）ラインレイヤ
+                map.addLayer({
+                    id: 'hokai_all_20240118_nanao-line',
+                    type: 'line',
+                    source: 'hokai_all_20240118_nanao',
+                    paint: {
+                        'line-color': '#FF0000',
+                        'line-width': 2,
+                    },
+                });
+
+                // 斜面崩壊・堆積分布データ（七尾地区）ポリゴンレイヤ
+                map.addLayer({
+                    id: 'hokai_all_20240118_nanao-fill',
+                    type: 'fill',
+                    source: 'hokai_all_20240118_nanao',
+                    paint: {
+                        'fill-color': '#FF0000',
+                        'fill-opacity': 0.1,
+                    },
+                });
+
+                // 斜面崩壊・堆積分布データ（輪島西地区）ソース
+                map.addSource('hokai_20240122_wajimaWEST', {
+                    type: 'geojson',
+                    data: 'https://shi-works.github.io/noto-hanto-earthquake-2024-gsi-ortho-map-on-maplibre-gl-js/data/hokai_20240122_wajimaWEST.geojson',
+                    attribution: '<a href="https://www.gsi.go.jp/BOUSAI/20240101_noto_earthquake.html">国土地理院 令和6年(2024年)能登半島地震に関する情報（斜面崩壊・堆積分布データ、津波浸水域、輪島市中心の火災焼失範囲、陸化したと思われる港）</a>',
+                });
+
+                // 斜面崩壊・堆積分布データ（輪島西地区）ラインレイヤ
+                map.addLayer({
+                    id: 'hokai_20240122_wajimaWEST-line',
+                    type: 'line',
+                    source: 'hokai_20240122_wajimaWEST',
+                    paint: {
+                        'line-color': '#FF0000',
+                        'line-width': 2,
+                    },
+                });
+
+                // 斜面崩壊・堆積分布データ（輪島西地区）ポリゴンレイヤ
+                map.addLayer({
+                    id: 'hokai_20240122_wajimaWEST-fill',
+                    type: 'fill',
+                    source: 'hokai_20240122_wajimaWEST',
+                    paint: {
+                        'fill-color': '#FF0000',
+                        'fill-opacity': 0.1,
+                    },
+                });
+
+                // ============================== 令和2年簡易100mメッシュ人口 ==============================
+
+                // 令和2年簡易100mメッシュ人口（石川県）ソース
+                map.addSource('100m_mesh_pop2020_ishikawa', {
+                    type: 'vector',
+                    url: 'pmtiles://https://xs489works.xsrv.jp/pmtiles-data/100m_mesh_pop2020/100m_mesh_pop2020_ishikawa.pmtiles',
+                    attribution: '<a href="https://gtfs-gis.jp/teikyo/index.html" target="_blank">地域・交通データ研究所 簡易100mメッシュ人口データ(2020年国勢調査ベース)</a>',
+                });
+
+                // 令和2年簡易100mメッシュ人口（石川県）レイヤ
+                map.addLayer({
+                    id: '100m_mesh_pop2020_ishikawa-fill',
+                    type: 'fill-extrusion',
+                    source: '100m_mesh_pop2020_ishikawa',
+                    'source-layer': '100m_mesh_pop2020_ishikawafgb',
+                    layout: {
+                        visibility: 'visible',
+                    },
+                    paint: {
+                        'fill-extrusion-color': ['case', p1, pop_colors[0], p2, pop_colors[1], p3, pop_colors[2], p4, pop_colors[3], p5, pop_colors[4], p6, pop_colors[5], pop_colors[5]],
+                        'fill-extrusion-height': ['*', ['to-number', ['get', 'PopT']], 10],
+                        'fill-extrusion-opacity': 0.5,
+                    },
+                });
+
+                // ==============================  国土交通省 道路復旧見える化マップ ==============================
+
+                // 新しいソースとレイヤーを追加する関数
+                function addEmergencyRestoredSectionLayer(date) {
+                    // 緊急復旧済み区間ソース
+                    map.addSource(date, {
+                        type: 'geojson',
+                        data: './data/mlit/' + date + '/json/emergency_restored_section.geojson',
+                        attribution: '<a href="https://www.mlit.go.jp/road/r6noto/index2.html" target="_blank">令和6年能登半島地震 道路復旧見える化マップ(国土交通省)</a>',
                     });
 
-                    // 路線名ラベルレイヤ
-                    map.addLayer({
-                        'id': date + '-label',
-                        'type': 'symbol',
-                        'source': date,
-                        'layout': {
-                            'text-field': ['get', 'name'],
-                            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-                            'text-size': 12,
-                            'symbol-placement': 'line-center',
-                            'text-anchor': 'top',
-                            'text-allow-overlap': true,
-                            'visibility': 'visible'
-                        },
-                        'paint': {
-                            'text-color': '#000',
-                            'text-halo-color': '#fff',
-                            'text-halo-width': 1
-                        }
-                    });
-                } else {
-                    // 緊急復旧済み区間レイヤ
-                    map.addLayer({
-                        'id': date,
-                        "type": "line",
-                        'source': date,
-                        minzoom: 1,
-                        maxzoom: 23,
-                        layout: {
-                            'visibility': 'none'
-                        },
-                        paint: {
-                            'line-color': [
-                                'match',
-                                ['get', '_color'],
-                                '#0000ff', '#0000ff',
-                                '#990000', '#990000',
-                                '#6aa84f', '#00B050',
-                                '#ff00ff', '#ff00ff',
-                                '#000000', '#000000',
-                                '#656565'
-                            ],
-                            'line-width': 6,
-                            'line-opacity': 1
-                        }
-                    });
+                    if (date === '240112data') {
+                        // 緊急復旧済み区間レイヤ
+                        map.addLayer({
+                            id: date,
+                            type: 'line',
+                            source: date,
+                            minzoom: 1,
+                            maxzoom: 23,
+                            layout: {
+                                visibility: 'visible',
+                            },
+                            paint: {
+                                'line-color': ['match', ['get', '_color'], '#0000ff', '#0000ff', '#990000', '#990000', '#6aa84f', '#00B050', '#ff00ff', '#ff00ff', '#000000', '#000000', '#656565'],
+                                'line-width': 6,
+                                'line-opacity': 1,
+                            },
+                        });
 
-                    // 路線名ラベルレイヤ
-                    map.addLayer({
-                        'id': date + '-label',
-                        'type': 'symbol',
-                        'source': date,
-                        'layout': {
-                            'text-field': ['get', 'name'],
-                            'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-                            'text-size': 12,
-                            'symbol-placement': 'line-center',
-                            'text-anchor': 'top',
-                            'text-allow-overlap': true,
-                            'visibility': 'none'
-                        },
-                        'paint': {
-                            'text-color': '#000',
-                            'text-halo-color': '#fff',
-                            'text-halo-width': 1
-                        }
-                    });
+                        // 路線名ラベルレイヤ
+                        map.addLayer({
+                            id: date + '-label',
+                            type: 'symbol',
+                            source: date,
+                            layout: {
+                                'text-field': ['get', 'name'],
+                                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                                'text-size': 12,
+                                'symbol-placement': 'line-center',
+                                'text-anchor': 'top',
+                                'text-allow-overlap': true,
+                                visibility: 'visible',
+                            },
+                            paint: {
+                                'text-color': '#000',
+                                'text-halo-color': '#fff',
+                                'text-halo-width': 1,
+                            },
+                        });
+                    } else {
+                        // 緊急復旧済み区間レイヤ
+                        map.addLayer({
+                            id: date,
+                            type: 'line',
+                            source: date,
+                            minzoom: 1,
+                            maxzoom: 23,
+                            layout: {
+                                visibility: 'none',
+                            },
+                            paint: {
+                                'line-color': ['match', ['get', '_color'], '#0000ff', '#0000ff', '#990000', '#990000', '#6aa84f', '#00B050', '#ff00ff', '#ff00ff', '#000000', '#000000', '#656565'],
+                                'line-width': 6,
+                                'line-opacity': 1,
+                            },
+                        });
+
+                        // 路線名ラベルレイヤ
+                        map.addLayer({
+                            id: date + '-label',
+                            type: 'symbol',
+                            source: date,
+                            layout: {
+                                'text-field': ['get', 'name'],
+                                'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                                'text-size': 12,
+                                'symbol-placement': 'line-center',
+                                'text-anchor': 'top',
+                                'text-allow-overlap': true,
+                                visibility: 'none',
+                            },
+                            paint: {
+                                'text-color': '#000',
+                                'text-halo-color': '#fff',
+                                'text-halo-width': 1,
+                            },
+                        });
+                    }
                 }
 
-            }
+                // 新しいソースとレイヤーを追加
+                var dates = ['240112data', '240113data', '240114data', '240115data', '240116data', '240117data', '240118data', '240119data', '240120data', '240121data', '240122data', '240123data', '240124data', '240125data', '240126data', '240127data', '240128data', '240129data', '240130data', '240131data', '240201data', '240202data', '240203data', '240204data', '240205data', '240206data', '240207data'];
 
-            // 新しいソースとレイヤーを追加
-            var dates = [
-                '240112data',
-                '240113data',
-                '240114data',
-                '240115data',
-                '240116data',
-                '240117data',
-                '240118data',
-                '240119data',
-                '240120data',
-                '240121data',
-                '240122data',
-                '240123data',
-                '240124data',
-                '240125data',
-                '240126data',
-                '240127data',
-                '240128data',
-                '240129data',
-                '240130data',
-                '240131data',
-                '240201data',
-                '240202data',
-            ];
+                dates.forEach((date) => addEmergencyRestoredSectionLayer(date));
 
-            dates.forEach(date => addEmergencyRestoredSectionLayer(date));
+                // 役場ソース
+                map.addSource('town-hall', {
+                    type: 'geojson',
+                    data: 'https://xs489works.xsrv.jp/pmtiles-data/ksj/P05-22_01_47_town_hall_add_cityname.geojson',
+                    attribution: '<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-P05-v3_0.html">国土数値情報 市町村役場（令和4年度）</a>',
+                });
 
-            // 役場ソース
-            map.addSource('town-hall', {
-                'type': 'geojson',
-                'data': 'https://xs489works.xsrv.jp/pmtiles-data/ksj/P05-22_01_47_town_hall_add_cityname.geojson',
-                attribution: '<a href="https://nlftp.mlit.go.jp/ksj/gml/datalist/KsjTmplt-P05-v3_0.html">国土数値情報 市町村役場（令和4年度）</a>'
+                // 役場ポイントレイヤ
+                // 外側の黒い円
+                map.addLayer({
+                    id: 'town-hall-points-outer-1',
+                    type: 'circle',
+                    source: 'town-hall',
+                    minzoom: 9,
+                    maxzoom: 12,
+                    paint: {
+                        'circle-color': 'rgba(0, 0, 0, 1)',
+                        'circle-radius': 5.5,
+                        'circle-blur': 0,
+                        'circle-opacity': 1,
+                    },
+                });
+
+                // 内側の白い円
+                map.addLayer({
+                    id: 'town-hall-points-inner-1',
+                    type: 'circle',
+                    source: 'town-hall',
+                    minzoom: 9,
+                    maxzoom: 12,
+                    paint: {
+                        'circle-color': 'rgba(255, 255, 255, 1)',
+                        'circle-radius': 4,
+                        'circle-blur': 0,
+                        'circle-opacity': 1,
+                    },
+                });
+
+                // 外側の黒い円
+                map.addLayer({
+                    id: 'town-hall-points-outer-2',
+                    type: 'circle',
+                    source: 'town-hall',
+                    minzoom: 9,
+                    maxzoom: 12,
+                    paint: {
+                        'circle-color': 'rgba(0, 0, 0, 1)',
+                        'circle-radius': 3,
+                        'circle-blur': 0,
+                        'circle-opacity': 1,
+                    },
+                });
+
+                // 内側の白い円
+                map.addLayer({
+                    id: 'town-hall-points-inner-2',
+                    type: 'circle',
+                    source: 'town-hall',
+                    minzoom: 9,
+                    maxzoom: 12,
+                    paint: {
+                        'circle-color': 'rgba(255, 255, 255, 1)',
+                        'circle-radius': 2.25,
+                        'circle-blur': 0,
+                        'circle-opacity': 1,
+                    },
+                });
+
+                // 役場ラベルレイヤ
+                map.addLayer({
+                    id: 'town-hall-labels-1',
+                    type: 'symbol',
+                    source: 'town-hall',
+                    minzoom: 9,
+                    maxzoom: 12,
+                    layout: {
+                        'text-field': ['get', 'city_name'],
+                        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                        'text-size': 12,
+                        'text-anchor': 'center',
+                        'text-justify': 'center',
+                        'text-offset': [0, -1.0],
+                        'text-allow-overlap': true,
+                    },
+                    paint: {
+                        'text-color': 'rgba(0, 0, 0, 1)',
+                        'text-halo-color': 'rgba(255, 255, 255, 1)',
+                        'text-halo-width': 1,
+                    },
+                });
+
+                // 役場ラベルレイヤ
+                map.addLayer({
+                    id: 'town-hall-labels-2',
+                    type: 'symbol',
+                    source: 'town-hall',
+                    minzoom: 12,
+                    maxzoom: 18,
+                    layout: {
+                        'text-field': ['get', 'city_name'],
+                        'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+                        'text-size': 18,
+                        'text-anchor': 'center',
+                        'text-justify': 'center',
+                        'text-offset': [0, -1.0],
+                        'text-allow-overlap': true,
+                    },
+                    paint: {
+                        'text-color': 'rgba(0, 0, 0, 1)',
+                        'text-halo-color': 'rgba(255, 255, 255, 1)',
+                        'text-halo-width': 2,
+                    },
+                });
             });
 
-            // 役場ポイントレイヤ
-            // 外側の黒い円
-            map.addLayer({
-                'id': 'town-hall-points-outer-1',
-                'type': 'circle',
-                'source': 'town-hall',
-                'minzoom': 9,
-                'maxzoom': 12,
-                'paint': {
-                    'circle-color': 'rgba(0, 0, 0, 1)',
-                    'circle-radius': 5.5,
-                    'circle-blur': 0,
-                    'circle-opacity': 1
-                }
-            });
+            // レイヤ設定
+            let Map_AddLayer = {
+                '240112data': '0',
+                '240113data': '1',
+                '240114data': '2',
+                '240115data': '3',
+                '240116data': '4',
+                '240117data': '5',
+                '240118data': '6',
+                '240119data': '7',
+                '240120data': '8',
+                '240121data': '9',
+                '240122data': '10',
+                '240123data': '11',
+                '240124data': '12',
+                '240125data': '13',
+                '240126data': '14',
+                '240127data': '15',
+                '240128data': '16',
+                '240129data': '17',
+                '240130data': '18',
+                '240131data': '19',
+                '240201data': '20',
+                '240202data': '21',
+                '240203data': '22',
+                '240204data': '23',
+                '240205data': '24',
+                '240206data': '25',
+                '240207data': '26',
+            };
 
-            // 内側の白い円
-            map.addLayer({
-                'id': 'town-hall-points-inner-1',
-                'type': 'circle',
-                'source': 'town-hall',
-                'minzoom': 9,
-                'maxzoom': 12,
-                'paint': {
-                    'circle-color': 'rgba(255, 255, 255, 1)',
-                    'circle-radius': 4,
-                    'circle-blur': 0,
-                    'circle-opacity': 1
-                }
-            });
-
-            // 外側の黒い円
-            map.addLayer({
-                'id': 'town-hall-points-outer-2',
-                'type': 'circle',
-                'source': 'town-hall',
-                'minzoom': 9,
-                'maxzoom': 12,
-                'paint': {
-                    'circle-color': 'rgba(0, 0, 0, 1)',
-                    'circle-radius': 3,
-                    'circle-blur': 0,
-                    'circle-opacity': 1
-                }
-            });
-
-            // 内側の白い円
-            map.addLayer({
-                'id': 'town-hall-points-inner-2',
-                'type': 'circle',
-                'source': 'town-hall',
-                'minzoom': 9,
-                'maxzoom': 12,
-                'paint': {
-                    'circle-color': 'rgba(255, 255, 255, 1)',
-                    'circle-radius': 2.25,
-                    'circle-blur': 0,
-                    'circle-opacity': 1
-                }
-            });
-
-            // 役場ラベルレイヤ
-            map.addLayer({
-                'id': 'town-hall-labels-1',
-                'type': 'symbol',
-                'source': 'town-hall',
-                minzoom: 9,
-                maxzoom: 12,
-                'layout': {
-                    'text-field': ['get', 'city_name'],
-                    'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-                    'text-size': 12,
-                    'text-anchor': 'center',
-                    'text-justify': 'center',
-                    'text-offset': [0, -1.0],
-                    'text-allow-overlap': true
-                },
-                'paint': {
-                    'text-color': 'rgba(0, 0, 0, 1)',
-                    'text-halo-color': 'rgba(255, 255, 255, 1)',
-                    'text-halo-width': 1
-                }
-            });
-
-            // 役場ラベルレイヤ
-            map.addLayer({
-                'id': 'town-hall-labels-2',
-                'type': 'symbol',
-                'source': 'town-hall',
-                minzoom: 12,
-                maxzoom: 18,
-                'layout': {
-                    'text-field': ['get', 'city_name'],
-                    'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-                    'text-size': 18,
-                    'text-anchor': 'center',
-                    'text-justify': 'center',
-                    'text-offset': [0, -1.0],
-                    'text-allow-overlap': true
-                },
-                'paint': {
-                    'text-color': 'rgba(0, 0, 0, 1)',
-                    'text-halo-color': 'rgba(255, 255, 255, 1)',
-                    'text-halo-width': 2
-                }
-            });
-
-        });
-
-
-        // レイヤ設定
-        let Map_AddLayer = {
-            "240112data": "0",
-            "240113data": "1",
-            "240114data": "2",
-            "240115data": "3",
-            "240116data": "4",
-            "240117data": "5",
-            "240118data": "6",
-            "240119data": "7",
-            "240120data": "8",
-            "240121data": "9",
-            "240122data": "10",
-            "240123data": "11",
-            "240124data": "12",
-            "240125data": "13",
-            "240126data": "14",
-            "240127data": "15",
-            "240128data": "16",
-            "240129data": "17",
-            "240130data": "18",
-            "240131data": "19",
-            "240201data": "20",
-            "240202data": "21",
-        };
-
-        // スライダーの値から日付文字列への変換関数
-        /*
+            // スライダーの値から日付文字列への変換関数
+            /*
         function sliderValueToDate(sliderValue) {
             let year = "2024";
             let month = "01";
@@ -792,43 +736,45 @@
         }
         */
 
-        // スライダーの値から日付文字列への変換関数
-        function sliderValueToDate(sliderValue) {
-            let year = "2024";
-            let month;
-            let day;
+            // スライダーの値から日付文字列への変換関数
+            function sliderValueToDate(sliderValue) {
+                let year = '2024';
+                let month;
+                let day;
 
-            // 1月の日数を計算（1月12日から始まるため、sliderValueが19以下の場合は1月）
-            if (sliderValue <= 19) { // 1月31日までの計算 (19 = 31 - 12)
-                month = "01";
-                day = parseInt(sliderValue) + 12; // 0を12日に変換
-            } else { // 2月の計算
-                month = "02";
-                // 2月1日からの日付を計算するために、1月の日数を超えた分から計算する
-                day = parseInt(sliderValue) - 19; // 2月1日に調整
+                // 1月の日数を計算（1月12日から始まるため、sliderValueが19以下の場合は1月）
+                if (sliderValue <= 19) {
+                    // 1月31日までの計算 (19 = 31 - 12)
+                    month = '01';
+                    day = parseInt(sliderValue) + 12; // 0を12日に変換
+                } else {
+                    // 2月の計算
+                    month = '02';
+                    // 2月1日からの日付を計算するために、1月の日数を超えた分から計算する
+                    day = parseInt(sliderValue) - 19; // 2月1日に調整
+                }
+
+                return `${year}年${month}月${day.toString().padStart(2, '0')}日正午時点`;
             }
 
-            return `${year}年${month}月${day.toString().padStart(2, '0')}日正午時点`;
-        }
+            // ラベルの初期値
+            document.getElementById('date_label').textContent = '2024年01月12日正午時点';
 
-        // ラベルの初期値
-        document.getElementById('date_label').textContent = "2024年01月12日正午時点";
+            // タイムスライダー制御
+            document.getElementById('slider').addEventListener('input', function (e) {
+                let sliderValue = e.target.value;
+                let selectedDate = sliderValueToDate(sliderValue);
+                document.getElementById('date_label').textContent = selectedDate;
 
-        // タイムスライダー制御
-        document.getElementById('slider').addEventListener('input', function (e) {
-            let sliderValue = e.target.value;
-            let selectedDate = sliderValueToDate(sliderValue);
-            document.getElementById('date_label').textContent = selectedDate;
+                // すべてのレイヤーをループし、選択された日付のレイヤーのみを表示
+                for (let id in Map_AddLayer) {
+                    let visibility = Map_AddLayer[id] === sliderValue ? 'visible' : 'none';
+                    map.setLayoutProperty(id, 'visibility', visibility);
+                    map.setLayoutProperty(id + '-label', 'visibility', visibility);
+                }
+            });
 
-            // すべてのレイヤーをループし、選択された日付のレイヤーのみを表示
-            for (let id in Map_AddLayer) {
-                let visibility = (Map_AddLayer[id] === sliderValue) ? 'visible' : 'none';
-                map.setLayoutProperty(id, 'visibility', visibility);
-                map.setLayoutProperty(id + '-label', 'visibility', visibility);
-            }
-        });
-
-        /*
+            /*
         //タイムスライダー制御
         document.getElementById('date_label').textContent = "240112data";
 
@@ -864,8 +810,6 @@
             });
         });
         */
-
-    </script>
-</body>
-
+        </script>
+    </body>
 </html>
