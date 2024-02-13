@@ -170,14 +170,14 @@
         </div>
         <div class="map-overlay top">
             <div class="map-overlay-inner">
-                <h4>緊急復旧済み区間（1/12～2/7）</h4>
+                <h4>緊急復旧済み区間（1/12～2/12）</h4>
                 <!--
             使用データ：<br>
             <a href="https://www.mlit.go.jp/road/r6noto/index2.html" target="_blank" rel="noopener">
                 令和6年能登半島地震 道路復旧見える化マップGISデータ</a><br><br>
             -->
                 <label id="date_label"></label>
-                <input id="slider" type="range" min="0" max="26" step="1" value="0" />
+                <input id="slider" type="range" min="0" max="31" step="1" value="0" />
             </div>
         </div>
         <script type="module">
@@ -576,7 +576,7 @@
                 }
 
                 // 新しいソースとレイヤーを追加
-                var dates = ['240112data', '240113data', '240114data', '240115data', '240116data', '240117data', '240118data', '240119data', '240120data', '240121data', '240122data', '240123data', '240124data', '240125data', '240126data', '240127data', '240128data', '240129data', '240130data', '240131data', '240201data', '240202data', '240203data', '240204data', '240205data', '240206data', '240207data'];
+                var dates = ['240112data', '240113data', '240114data', '240115data', '240116data', '240117data', '240118data', '240119data', '240120data', '240121data', '240122data', '240123data', '240124data', '240125data', '240126data', '240127data', '240128data', '240129data', '240130data', '240131data', '240201data', '240202data', '240203data', '240204data', '240205data', '240206data', '240207data', '240208data', '240209data', '240210data', '240211data', '240212data'];
 
                 dates.forEach((date) => addEmergencyRestoredSectionLayer(date));
 
@@ -724,6 +724,11 @@
                 '240205data': '24',
                 '240206data': '25',
                 '240207data': '26',
+                '240208data': '27',
+                '240209data': '28',
+                '240210data': '29',
+                '240211data': '30',
+                '240212data': '31',
             };
 
             // スライダーの値から日付文字列への変換関数
